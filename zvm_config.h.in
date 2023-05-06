@@ -1,0 +1,4 @@
+
+constexpr int kZvmVersionMajor = @zvm_VERSION_MAJOR@;
+constexpr int kZvmVersionMinor = @zvm_VERSION_MINOR@;
+constexpr int kZvmVersionPatch = @zvm_VERSION_PATCH@;
