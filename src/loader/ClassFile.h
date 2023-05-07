@@ -5,18 +5,14 @@
 
 #include "util/types.h"
 
-namespace zvm {
-
-namespace loader {
-    class ClassFileParser;
-}
+namespace zvm::loader {
 
 class ClassFile {
 public:
     u4 magic() const { return mMagic; }
 
 private:
-    friend class loader::ClassFileParser;
+    friend class ClassFileParser;
     u4 mMagic;
 };
 

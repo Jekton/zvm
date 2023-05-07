@@ -4,3 +4,13 @@ add_library(loader
     ClassFileParser.cpp
     ClassVerifier.cpp
 )
+
+add_executable(ClassFileParserTest
+    ClassFileParserTest.cpp
+)
+target_link_libraries(ClassFileParserTest
+    loader
+    util
+    GTest::gtest_main
+)
+gtest_discover_tests(ClassFileParserTest)
