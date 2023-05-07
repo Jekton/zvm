@@ -15,6 +15,12 @@ std::unique_ptr<ClassFile> ClassFileParser::parse(util::File file) {
     fread(&magic, 4, 1, file.get());
     classFile->mMagic = ntohl(magic);
 
+    u2 version;
+    fread(&version, 2, 1, file.get());
+    classFile->mMinorVersion = ntohs(version);
+    fread(&version, 2, 1, file.get());
+    classFile->mMajorVersion = ntohs(version);
+
     if (!verifyClass(classFile.get())) {
         classFile.reset();
     }

@@ -30,3 +30,8 @@ TEST_F(ClassFileParserTest, Precondition) {
 TEST_F(ClassFileParserTest, Magic) {
     ASSERT_EQ(mClassFile->magic(), 0xcafebabe);
 }
+
+TEST_F(ClassFileParserTest, Version) {
+    ASSERT_EQ(mClassFile->majorVersion(), 61);
+    ASSERT_EQ(mClassFile->minorVersion(), 0);
+}
