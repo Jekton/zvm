@@ -19,6 +19,8 @@ struct CPInfo {
     static constexpr int kTagNameAndType = 12;
 
     u1 tag;
+
+    static const char* nameOfTag(int tag);
 };
 
 
@@ -58,6 +60,7 @@ public:
         u2 descriptorIndex;
     };
 
+    using StringPair = std::pair<const std::string*, const std::string*>;
 
     ConstantPool() = default;
     ConstantPool(const ConstantPool&) = delete;
@@ -75,27 +78,50 @@ public:
         return get(index);
     }
 
+    const std::string* getUtf8(size_t index) const;
+    const std::string* getClass(size_t index) const;
     // TODO: use a String class index
     const std::string* getString(size_t index) const;
-    const std::string* getUtf8(size_t index) const;
+    const StringPair* getNameAndType(size_t index) const;
 
 private:
     static CPInfo* parseOne(util::File& in);
 
     std::vector<CPInfo*> mInfos;
-    mutable std::vector<void*> mParsedInfos;
+    mutable std::vector<const void*> mParsedInfos;
 };
 
 
-inline auto asUtf8Info(CPInfo* info) {
+inline auto asUtf8Info(const CPInfo* info) {
     check(info->tag == CPInfo::kTagUtf8);
-    return reinterpret_cast<ConstantPool::Utf8Info*>(info);
+    return reinterpret_cast<const ConstantPool::Utf8Info*>(info);
 }
 
-inline auto asStringInfo(CPInfo* info) {
-    check(info->tag == CPInfo::kTagString);
-    return reinterpret_cast<ConstantPool::StringInfo*>(info);
+inline auto asClassInfo(const CPInfo* info) {
+    check(info->tag == CPInfo::kTagClass);
+    return reinterpret_cast<const ConstantPool::ClassInfo*>(info);
 }
+
+inline auto asStringInfo(const CPInfo* info) {
+    check(info->tag == CPInfo::kTagString);
+    return reinterpret_cast<const ConstantPool::StringInfo*>(info);
+}
+
+inline auto asFieldRef(const CPInfo* info) {
+    check(info->tag == CPInfo::kTagFieldRef);
+    return reinterpret_cast<const ConstantPool::FieldRef*>(info);
+}
+
+inline auto asMethodRef(const CPInfo* info) {
+    check(info->tag == CPInfo::kTagMethodRef);
+    return reinterpret_cast<const ConstantPool::MethodRef*>(info);
+}
+
+inline auto asNameAndType(const CPInfo* info) {
+    check(info->tag == CPInfo::kTagNameAndType);
+    return reinterpret_cast<const ConstantPool::NameAndTypeInfo*>(info);
+}
+
 
 
 }

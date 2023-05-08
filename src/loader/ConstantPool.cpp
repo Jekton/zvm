@@ -26,6 +26,20 @@ static std::map<u1, CPInfoParser> sParsers = {
     {CPInfo::kTagNameAndType, nameAndTypeParser},
 };
 
+
+const char* CPInfo::nameOfTag(int tag) {
+    switch (tag) {
+        case kTagUtf8: return "Utf8";
+        case kTagClass: return "Class";
+        case kTagString: return "String";
+        case kTagFieldRef: return "Fieldref";
+        case kTagMethodRef: return "Methodref";
+        case kTagNameAndType: return "NameAndType";
+        default: return "[unknown]";
+    }
+}
+
+
 bool ConstantPool::parseCPInfo(util::File& in) {
     u2 constantPoolCount;
     ensure(in.readBigEndian(&constantPoolCount), "fail to read constant_pool_count");
@@ -137,11 +151,30 @@ const std::string* ConstantPool::getUtf8(size_t index) const {
     auto ptr = mParsedInfos[index];
     if (ptr) return static_cast<const std::string*>(ptr);
     auto info = asUtf8Info(mInfos[index]);
-    auto chars = reinterpret_cast<char*>(info->bytes);
+    auto chars = reinterpret_cast<const char*>(info->bytes);
     auto str = new std::string(chars, info->length);
     mParsedInfos[index] = str;
     return str;
 }
 
+const std::string* ConstantPool::getClass(size_t index) const {
+    auto ptr = mParsedInfos[index];
+    if (ptr) return static_cast<const std::string*>(ptr);
+    auto info = asClassInfo(mInfos[index]);
+    auto str = getUtf8(info->nameIndex);
+    mParsedInfos[index] = str;
+    return str;
+}
+
+const ConstantPool::StringPair* ConstantPool::getNameAndType(size_t index) const {
+    auto ptr = mParsedInfos[index];
+    if (ptr) static_cast<const StringPair*>(ptr);
+    auto info = asNameAndType(mInfos[index]);
+    auto name = getUtf8(info->nameIndex);
+    auto descriptor = getUtf8(info->descriptorIndex);
+    auto p = new StringPair(name, descriptor);
+    mParsedInfos[index] = p;
+    return p;
+}
 
 }
