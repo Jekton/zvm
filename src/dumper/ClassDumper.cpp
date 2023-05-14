@@ -7,6 +7,14 @@ void ClassDumper::dump(FILE* out) const {
     fprintf(out, "Magic: %8x\n", mClassFile->magic());
     fprintf(out, "minor version: %u\n", mClassFile->minorVersion());
     fprintf(out, "major version: %u\n", mClassFile->majorVersion());
+    dumpAccessFlags(out);
+    {
+        char buf[256];
+        snprintf(buf, sizeof(buf), "this_class: #%d", mClassFile->thisClassIndex());
+        fprintf(out, "%-41s // %s\n", buf, mClassFile->thisClass()->c_str());
+        snprintf(buf, sizeof(buf), "super_class: #%d", mClassFile->superClassIndex());
+        fprintf(out, "%-41s // %s\n", buf, mClassFile->superClass()->c_str());
+    }
     dumpConstantPool(out);
 }
 
@@ -77,5 +85,38 @@ void ClassDumper::dumpConstantPool(FILE* out) const {
         }
     }
 }
+
+static void dumpAFlags(
+    FILE* out, u2 flags,
+    const int flagInt,
+    const char* flagStr,
+    bool& isFirst
+) {
+    if (flags & flagInt) {
+        if (isFirst) {
+            isFirst = false;
+            fprintf(out, " %s", flagStr);
+        } else {
+            fprintf(out, ", %s", flagStr);
+        }
+    }
+}
+
+void ClassDumper::dumpAccessFlags(FILE* out) const {
+    auto flags = mClassFile->accessFlags();
+    fprintf(out, "flags: (0x%04x)", flags);
+    bool isFirst = true;
+    using namespace loader;
+    dumpAFlags(out, flags, ClassFile::kAccPublic, "ACC_PUBLIC", isFirst);
+    dumpAFlags(out, flags, ClassFile::kAccFinal, "ACC_FINAL", isFirst);
+    dumpAFlags(out, flags, ClassFile::kAccSuper, "ACC_SUPER", isFirst);
+    dumpAFlags(out, flags, ClassFile::kAccInterface, "ACC_INTERFACE", isFirst);
+    dumpAFlags(out, flags, ClassFile::kAccAbstract, "ACC_ABSTRACT", isFirst);
+    dumpAFlags(out, flags, ClassFile::kAccSynthetic, "ACC_SYNTHETIC", isFirst);
+    dumpAFlags(out, flags, ClassFile::kAccAnnotation, "ACC_ANNOTATION", isFirst);
+    dumpAFlags(out, flags, ClassFile::kAccEnum, "ACC_ENUM", isFirst);
+    fprintf(out, "\n");
+}
+
 
 }

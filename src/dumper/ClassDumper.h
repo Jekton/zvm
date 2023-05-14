@@ -14,6 +14,7 @@ public:
 
 private:
     void dumpConstantPool(FILE* out) const;
+    void dumpAccessFlags(FILE* out) const;
 
     std::unique_ptr<loader::ClassFile> mClassFile;
 };

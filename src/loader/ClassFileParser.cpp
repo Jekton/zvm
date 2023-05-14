@@ -20,10 +20,10 @@ std::unique_ptr<ClassFile> ClassFileParser::parse(util::File file) {
     u2 constantPoolCount;
     ensure(classFile->mConstantPool.parseCPInfo(file), "fail to read constant pool");
 
-    auto str = classFile->constantPool().getUtf8(4);
-    printf("#4 utf8 = %s\n", str->c_str());
-    auto str2 = classFile->constantPool().getString(13);
-    printf("#13 string = %s\n", str2->c_str());
+    ensure(file.readBigEndian(&classFile->mAccessFlags), "fail to read access flags");
+    ensure(file.readBigEndian(&classFile->mThisClass), "fail to read this class");
+    ensure(file.readBigEndian(&classFile->mSuperClass), "fail to read super class");
+
 
     if (!verifyClass(classFile.get())) {
         classFile.reset();

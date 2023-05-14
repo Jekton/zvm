@@ -72,3 +72,11 @@ TEST_F(ClassFileParserTest, ConstantPoll) {
     ASSERT_EQ(pool[27]->tag, loader::CPInfo::kTagUtf8);
     ASSERT_EQ(pool[28]->tag, loader::CPInfo::kTagUtf8);
 }
+
+TEST_F(ClassFileParserTest, FlagsAndClass) {
+    ASSERT_EQ(mClassFile->accessFlags(), 0x0020);
+    ASSERT_EQ(mClassFile->thisClassIndex(), 21);
+    ASSERT_EQ(mClassFile->superClassIndex(), 2);
+    ASSERT_STREQ(mClassFile->thisClass()->c_str(), "test/HelloWorld");
+    ASSERT_STREQ(mClassFile->superClass()->c_str(), "java/lang/Object");
+}
