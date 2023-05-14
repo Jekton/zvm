@@ -7,6 +7,10 @@ void ClassDumper::dump(FILE* out) const {
     fprintf(out, "Magic: %8x\n", mClassFile->magic());
     fprintf(out, "minor version: %u\n", mClassFile->minorVersion());
     fprintf(out, "major version: %u\n", mClassFile->majorVersion());
+    dumpConstantPool(out);
+}
+
+void ClassDumper::dumpConstantPool(FILE* out) const {
     auto& constantPool = mClassFile->constantPool();
     auto count = constantPool.count();
     char buf[1024];

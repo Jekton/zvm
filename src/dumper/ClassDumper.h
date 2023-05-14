@@ -13,6 +13,8 @@ public:
     void dump(FILE* out) const;
 
 private:
+    void dumpConstantPool(FILE* out) const;
+
     std::unique_ptr<loader::ClassFile> mClassFile;
 };
 
