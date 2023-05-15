@@ -168,7 +168,7 @@ const std::string* ConstantPool::getClass(size_t index) const {
 
 const ConstantPool::StringPair* ConstantPool::getNameAndType(size_t index) const {
     auto ptr = mParsedInfos[index];
-    if (ptr) static_cast<const StringPair*>(ptr);
+    if (ptr) return static_cast<const StringPair*>(ptr);
     auto info = asNameAndType(mInfos[index]);
     auto name = getUtf8(info->nameIndex);
     auto descriptor = getUtf8(info->descriptorIndex);

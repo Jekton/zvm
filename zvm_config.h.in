@@ -1,6 +1,9 @@
+#pragma once
 
 constexpr int kZvmVersionMajor = @zvm_VERSION_MAJOR@;
 constexpr int kZvmVersionMinor = @zvm_VERSION_MINOR@;
 constexpr int kZvmVersionPatch = @zvm_VERSION_PATCH@;
 
-const char* kSourceDir = "@PROJECT_SOURCE_DIR@";
+constexpr const char* kSourceDir = "@PROJECT_SOURCE_DIR@";
+
+#define DEBUG 1

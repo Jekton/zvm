@@ -9,40 +9,19 @@
 
 using namespace zvm;
 
-class ClassFileParserTest : public testing::Test {
-protected:
-    void SetUp() override {
-        auto path = std::string(kSourceDir) + "/test/HelloWorld.class";
-        auto file = util::File(path.c_str(), "r");
-        auto classFile = loader::ClassFileParser::parse(std::move(file));
-        mClassFile = std::move(classFile);
-    }
 
-    void TearDown() override { }
+TEST(ClassFileParserTest, HelloWorld0) {
+    auto path = std::string(kSourceDir) + "/test/HelloWorld.class";
+    auto file = util::File(path.c_str(), "r");
+    auto classFile = loader::ClassFileParser::parse(std::move(file));
 
-    std::unique_ptr<loader::ClassFile> mClassFile;
-};
+    ASSERT_NE(classFile.get(), nullptr);
+    ASSERT_EQ(classFile->magic(), 0xcafebabe);
+    ASSERT_EQ(classFile->majorVersion(), 61);
+    ASSERT_EQ(classFile->minorVersion(), 0);
 
-TEST_F(ClassFileParserTest, Precondition) {
-    ASSERT_NE(mClassFile.get(), nullptr);
-}
-
-TEST_F(ClassFileParserTest, Magic) {
-    ASSERT_EQ(mClassFile->magic(), 0xcafebabe);
-}
-
-TEST_F(ClassFileParserTest, Version) {
-    ASSERT_EQ(mClassFile->majorVersion(), 61);
-    ASSERT_EQ(mClassFile->minorVersion(), 0);
-}
-
-TEST_F(ClassFileParserTest, ConstantPollCount) {
-    auto& pool = mClassFile->constantPool();
+    auto& pool = classFile->constantPool();
     ASSERT_EQ(pool.count(), 29);
-}
-
-TEST_F(ClassFileParserTest, ConstantPoll) {
-    auto& pool = mClassFile->constantPool();
     ASSERT_EQ(pool[1]->tag, loader::CPInfo::kTagMethodRef);
     ASSERT_EQ(pool[2]->tag, loader::CPInfo::kTagClass);
     ASSERT_EQ(pool[3]->tag, loader::CPInfo::kTagNameAndType);
@@ -71,12 +50,29 @@ TEST_F(ClassFileParserTest, ConstantPoll) {
     ASSERT_EQ(pool[26]->tag, loader::CPInfo::kTagUtf8);
     ASSERT_EQ(pool[27]->tag, loader::CPInfo::kTagUtf8);
     ASSERT_EQ(pool[28]->tag, loader::CPInfo::kTagUtf8);
-}
 
-TEST_F(ClassFileParserTest, FlagsAndClass) {
-    ASSERT_EQ(mClassFile->accessFlags(), 0x0020);
-    ASSERT_EQ(mClassFile->thisClassIndex(), 21);
-    ASSERT_EQ(mClassFile->superClassIndex(), 2);
-    ASSERT_STREQ(mClassFile->thisClass()->c_str(), "test/HelloWorld");
-    ASSERT_STREQ(mClassFile->superClass()->c_str(), "java/lang/Object");
+    ASSERT_EQ(classFile->accessFlags(), 0x0020);
+    ASSERT_EQ(classFile->thisClassIndex(), 21);
+    ASSERT_EQ(classFile->superClassIndex(), 2);
+    ASSERT_STREQ(classFile->thisClass()->c_str(), "test/HelloWorld");
+    ASSERT_STREQ(classFile->superClass()->c_str(), "java/lang/Object");
+
+    auto interfaces = classFile->interfaces();
+    ASSERT_EQ(interfaces.size(), 0);
+
+    auto fields = classFile->fields();
+    ASSERT_EQ(fields.size(), 0);
+
+    auto methods = classFile->methods();
+    ASSERT_EQ(methods.size(), 2);
+    auto method = methods[0];
+    ASSERT_STREQ(method->name()->c_str(), "<init>");
+    ASSERT_STREQ(method->descriptor()->c_str(), "()V");
+
+    method = methods[1];
+    ASSERT_STREQ(method->name()->c_str(), "main");
+    ASSERT_STREQ(method->descriptor()->c_str(), "([Ljava/lang/String;)V");
+    auto code = method->getCode();
+    ASSERT_NE(code, nullptr);
+    ASSERT_EQ(code->codeLength, 9);
 }
