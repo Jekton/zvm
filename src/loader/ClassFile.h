@@ -14,6 +14,7 @@ namespace zvm::loader {
 class ClassFile {
 public:
     static constexpr const char* kAttributeCode = "Code";
+    static constexpr const char* kAttributeSourceFile = "SourceFile";
 
     static constexpr int kAccPublic = 0x0001;
     static constexpr int kAccFinal = 0x0010;
@@ -30,7 +31,7 @@ public:
         u2 maxLocals;
         u4 codeLength;
         u1* instructions;
-        std::map<std::string_view, void*> attributes;
+        std::map<std::string_view, const void*> attributes;
     };
 
     struct Method {
@@ -38,13 +39,13 @@ public:
         u2 nameIndex;
         u2 descriptorIndex;
         const ConstantPool& constantPool;
-        std::map<std::string_view, void*> attributes;
+        std::map<std::string_view, const void*> attributes;
 
         Method(const ConstantPool& constantPool): constantPool(constantPool) { }
 
         auto name() const { return constantPool.getUtf8(nameIndex); }
         auto descriptor() const { return constantPool.getUtf8(descriptorIndex); }
-        const Code* getCode() const;
+        Nullable const Code* getCode() const;
     };
 
 
@@ -65,6 +66,8 @@ public:
     const std::vector<u2> fields() const { return mFields; }
     const std::vector<Method*> methods() const { return mMethods; }
 
+    Nullable const std::string* sourceFile() const;
+
 private:
     friend class ClassFileParser;
     u4 mMagic;
@@ -77,6 +80,7 @@ private:
     std::vector<u2> mInterfaces;
     std::vector<u2> mFields;
     std::vector<Method*> mMethods;
+    std::map<std::string_view, const void*> mAttributes;
 };
 
 }

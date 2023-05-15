@@ -16,8 +16,12 @@ static void parseAttributes(
     util::File& file,
     const ConstantPool& constantPool,
     int count,
-    std::map<std::string_view, void*>& attributes);
-static void* codeParser(
+    std::map<std::string_view, const void*>& attributes);
+static const void* codeParser(
+    util::File& file,
+    const ConstantPool& constantPool,
+    u4 atrtributeLength);
+static const void* sourceFileParser(
     util::File& file,
     const ConstantPool& constantPool,
     u4 atrtributeLength);
@@ -26,6 +30,7 @@ static bool verifyClass(ClassFile* classFile);
 
 static std::map<std::string_view, decltype(&codeParser)> sAttributeParsers = {
     {ClassFile::kAttributeCode, codeParser},
+    {ClassFile::kAttributeSourceFile, sourceFileParser},
 };
 
 
@@ -56,6 +61,10 @@ std::unique_ptr<ClassFile> ClassFileParser::parse(util::File file) {
         classFile->mMethods.push_back(method);
     }
 
+    u2 attributeCount;
+    ensure(file.readBigEndian(&attributeCount), "fail to read attribute count of class");
+    parseAttributes(file, classFile->constantPool(), attributeCount, classFile->mAttributes);
+
     if (!verifyClass(classFile.get())) {
         classFile.reset();
     }
@@ -77,7 +86,7 @@ static void parseAttributes(
     util::File& file,
     const ConstantPool& constantPool,
     int count,
-    std::map<std::string_view, void*>& attributes
+    std::map<std::string_view, const void*>& attributes
 ) {
     for (int i = 0; i < count; ++i) {
         u2 nameIndex;
@@ -98,7 +107,7 @@ static void parseAttributes(
     }
 }
 
-static void* codeParser(
+static const void* codeParser(
     util::File& file,
     const ConstantPool& constantPool,
     u4 atrtributeLength
@@ -122,6 +131,16 @@ static void* codeParser(
     parseAttributes(file, constantPool, attributeCount, code->attributes);
 
     return code;
+}
+
+static const void* sourceFileParser(
+    util::File& file,
+    const ConstantPool& constantPool,
+    u4 atrtributeLength
+) {
+    u2 index;
+    ensure(file.readBigEndian(&index), "fail to read index of SourceFile attribute");
+    return constantPool.getUtf8(index);
 }
 
 

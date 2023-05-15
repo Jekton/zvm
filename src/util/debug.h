@@ -39,3 +39,7 @@
     printf("[WARN][%s] %s: " msg "\n",      \
            tag, __func__, ##__VA_ARGS__);   \
 } while (0)
+
+
+#define Nullable
+#define Nonnull

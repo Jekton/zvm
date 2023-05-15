@@ -75,4 +75,8 @@ TEST(ClassFileParserTest, HelloWorld0) {
     auto code = method->getCode();
     ASSERT_NE(code, nullptr);
     ASSERT_EQ(code->codeLength, 9);
+
+    auto sourceFile = classFile->sourceFile();
+    ASSERT_NE(sourceFile, nullptr);
+    ASSERT_STREQ(sourceFile->c_str(), "HelloWorld.java");
 }

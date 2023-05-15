@@ -13,4 +13,13 @@ const ClassFile::Code* ClassFile::Method::getCode() const {
 }
 
 
+const std::string* ClassFile::sourceFile() const {
+    auto it = mAttributes.find(kAttributeSourceFile);
+    if (it == mAttributes.end()) {
+        return nullptr;
+    }
+    return reinterpret_cast<const std::string*>(it->second);
+}
+
+
 }
