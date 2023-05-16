@@ -48,6 +48,17 @@ public:
         Nullable const Code* getCode() const;
     };
 
+    struct Field {
+        u2 accessFlags;
+        u2 nameIndex;
+        u2 descriptorIndex;
+        const ConstantPool& constantPool;
+
+        Field(const ConstantPool& constantPool): constantPool(constantPool) { }
+        auto name() const { return constantPool.getUtf8(nameIndex); }
+        auto descriptor() const { return constantPool.getUtf8(descriptorIndex); }
+    };
+
 
     u4 magic() const { return mMagic; }
     u2 majorVersion() const { return mMajorVersion; }
@@ -63,7 +74,7 @@ public:
         return mConstantPool.getClass(mSuperClass);
     }
     const std::vector<u2> interfaces() const { return mInterfaces; }
-    const std::vector<u2> fields() const { return mFields; }
+    const std::vector<Field*> fields() const { return mFields; }
     const std::vector<Method*> methods() const { return mMethods; }
 
     Nullable const std::string* sourceFile() const;
@@ -78,7 +89,7 @@ private:
     u2 mSuperClass;
     ConstantPool mConstantPool;
     std::vector<u2> mInterfaces;
-    std::vector<u2> mFields;
+    std::vector<Field*> mFields;
     std::vector<Method*> mMethods;
     std::map<std::string_view, const void*> mAttributes;
 };

@@ -11,6 +11,7 @@ static const char* kTag = "ClassFileParser";
 namespace zvm::loader {
 
 static ClassFile::Method* parseAMethod(util::File& file, const ConstantPool& constantPool);
+static ClassFile::Field* parseAField(util::File& file, const ConstantPool& constantPool);
 
 static void parseAttributes(
     util::File& file,
@@ -52,7 +53,10 @@ std::unique_ptr<ClassFile> ClassFileParser::parse(util::File file) {
 
     u2 fieldCount;
     ensure(file.readBigEndian(&fieldCount), "fail to read field count");
-    ensure(fieldCount == 0, "field not supported yet!");
+    for (int i = 0; i < fieldCount; ++i) {
+        auto field = parseAField(file, classFile->constantPool());
+        classFile->mFields.push_back(field);
+    }
 
     u2 methodCount;
     ensure(file.readBigEndian(&methodCount), "fail to read method count");
@@ -80,6 +84,17 @@ static ClassFile::Method* parseAMethod(util::File& file, const ConstantPool& con
     ensure(file.readBigEndian(&attributeCount), "fail to read attribute count of method");
     parseAttributes(file, constantPool, attributeCount, method->attributes);
     return method;
+}
+
+static ClassFile::Field* parseAField(util::File& file, const ConstantPool& constantPool) {
+    auto field = new ClassFile::Field(constantPool);
+    ensure(file.readBigEndian(&field->accessFlags), "fail to read access flasgs of field");
+    ensure(file.readBigEndian(&field->nameIndex), "fail to read name index of field");
+    ensure(file.readBigEndian(&field->descriptorIndex), "fail to read descriptor index of field");
+    u2 attributeCount;
+    ensure(file.readBigEndian(&attributeCount), "fail to read attribute count of field");
+    ensure(attributeCount == 0, "attribute of field not supported yet, count = %u", attributeCount);
+    return field;
 }
 
 static void parseAttributes(

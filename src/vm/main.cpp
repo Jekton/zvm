@@ -13,7 +13,7 @@ int main(int argc, char* argv[]) {
         printf("Hello, zvm %d.%d.%d!\n", kZvmVersionMajor, kZvmVersionMinor, kZvmVersionPatch);
         return 0;
     }
-    auto file = util::File("../test/HelloWorld.class", "r");
+    auto file = util::File("../src/zvm.base/z/lang/String.class", "r");
     auto classFile = loader::ClassFileParser::parse(std::move(file));
     dumper::ClassDumper dumper(std::move(classFile));
     dumper.dump(stdout);

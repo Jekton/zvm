@@ -3,7 +3,7 @@ project(zvm VERSION 0.0.1)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED true)
-
+set(CMAKE_CXX_FLAGS "-Werror")
 
 include(FetchContent)
 FetchContent_Declare(
