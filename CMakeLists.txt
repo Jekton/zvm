@@ -18,16 +18,16 @@ include(GoogleTest)
 
 configure_file(zvm_config.h.in  zvm_config.h)
 
-include_directories(PUCLIC src)
+include_directories(PUCLIC src/vm)
 include_directories(PRIVATE ${PROJECT_BINARY_DIR})
 
 
-add_subdirectory(src/dumper)
-add_subdirectory(src/loader)
-add_subdirectory(src/util)
+add_subdirectory(src/vm/dumper)
+add_subdirectory(src/vm/loader)
+add_subdirectory(src/vm/util)
 
 add_executable(zvm
-    src/main.cpp
+    src/vm/main.cpp
 )
 
 target_link_libraries(zvm loader dumper util)
